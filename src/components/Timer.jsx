@@ -14,7 +14,7 @@ const Timer = ({
   isMuted,
 }) => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [isCounterTopTurn, setIsTopCounterTurn] = useState(true);
+  const [isCounterTopTurn, setIsCounterTopTurn] = useState(true);
 
   const counterTop = useCounter(counterTopInitialSeconds);
   const counterBottom = useCounter(counterBottomInitialSeconds);
@@ -30,19 +30,24 @@ const Timer = ({
   }, [counterBottom, counterTop, isCounterTopTurn, isTimerRunning]);
 
   function alternateTurn() {
+    if (!isTimerRunning) {
+      // If the timer is still paused.
+      return;
+    }
+
     if (isCounterTopTurn) {
       // When it's counter-top's turn.
       counterTop.setMs((prev) => prev + counterTopIncrementSeconds * 1000); // Increment after each move.
       counterTop.pauseTimer();
       counterBottom.startTimer();
-      setIsTopCounterTurn(false);
+      setIsCounterTopTurn(false);
     } else {
       counterBottom.setMs(
         (prev) => prev + counterBottomIncrementSeconds * 1000
       );
       counterBottom.pauseTimer();
       counterTop.startTimer();
-      setIsTopCounterTurn(true);
+      setIsCounterTopTurn(true);
     }
 
     playCounterClick();
@@ -98,7 +103,7 @@ const Timer = ({
             : "bg-blue-700 text-white"
         }`}
         onClick={() => {
-          if (isCounterTopTurn === false || isTimerRunning === false) {
+          if (!isCounterTopTurn) {
             return;
           }
 
@@ -148,7 +153,7 @@ const Timer = ({
             : "bg-blue-700 text-white"
         }`}
         onClick={() => {
-          if (isCounterTopTurn === true || isTimerRunning === false) {
+          if (isCounterTopTurn) {
             return;
           }
 
