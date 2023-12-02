@@ -36,8 +36,8 @@ const MainMenu = ({
   }
 
   return (
-    <div className="text-white bg-neutral-800">
-      <div className="container flex flex-col justify-between h-screen p-2 mx-auto">
+    <div className="text-white bg-neutral-600">
+      <div className="max-w-[480px] bg-neutral-700 flex flex-col justify-between h-screen p-2 mx-auto">
         <div>
           <h2 className="mb-6 text-3xl font-bold text-center">Chess Clock</h2>
           <form className="flex flex-col gap-2" onSubmit={submitData}>
@@ -50,7 +50,7 @@ const MainMenu = ({
                   onChange={(e) => setIsTimeDifferenceEnabled(e.target.checked)}
                   checked={isTimeDifferenceEnabled}
                 />
-                <div className="w-11 h-6 bg-neutral-700 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-700"></div>
+                <div className="w-11 h-6 bg-neutral-600 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
 
@@ -65,7 +65,7 @@ const MainMenu = ({
                     type="number"
                     name="time"
                     id="time"
-                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-700"
+                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
                     placeholder="Enter minute
                             "
                     onChange={(e) =>
@@ -86,7 +86,7 @@ const MainMenu = ({
                     type="number"
                     name="time"
                     id="time"
-                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-700"
+                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
                     placeholder="Enter second
                             "
                     onChange={(e) =>
@@ -109,7 +109,7 @@ const MainMenu = ({
                     type="number"
                     name="time"
                     id="time"
-                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-700"
+                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
                     placeholder="Enter minute
                             "
                     onChange={(e) =>
@@ -130,7 +130,7 @@ const MainMenu = ({
                     type="number"
                     name="time"
                     id="time"
-                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-700"
+                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
                     placeholder="Enter second
                             "
                     onChange={(e) =>
@@ -154,7 +154,7 @@ const MainMenu = ({
                     type="number"
                     name="time"
                     id="time"
-                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-700"
+                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
                     placeholder="Enter minute
                       "
                     onChange={(e) =>
@@ -176,7 +176,7 @@ const MainMenu = ({
                     type="number"
                     name="time"
                     id="time"
-                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-700"
+                    className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
                     placeholder="Enter second
                       "
                     onChange={(e) =>
@@ -203,12 +203,12 @@ const MainMenu = ({
                   onChange={(e) => setIsMuted(e.target.checked)}
                   checked={isMuted}
                 />
-                <div className="w-11 h-6 bg-neutral-700 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-700"></div>
+                <div className="w-11 h-6 bg-neutral-600 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
             <button
               type="submit"
-              className="px-4 py-2 mt-6 text-lg bg-blue-700 hover:bg-blue-800"
+              className="px-4 py-2 mt-6 text-lg bg-blue-600 hover:bg-blue-700"
             >
               Start!
             </button>

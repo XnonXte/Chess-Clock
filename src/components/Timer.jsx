@@ -102,10 +102,10 @@ const Timer = ({
     setIsMuted((prevFlag) => !prevFlag);
   }
 
-  function handleGoBackClick() {
-    const confirmGoBack = confirm("Go back to menu?");
+  function handleReturnClick() {
+    const confirmReturn = confirm("Go back to menu?");
 
-    if (!confirmGoBack) {
+    if (!confirmReturn) {
       return;
     }
 
@@ -114,71 +114,70 @@ const Timer = ({
   }
 
   return (
-    <>
-      <div
-        className={`h-[45vh] text-8xl md:text-8xl flex justify-center items-center font-semibold rotate-180 ${ctTheme}`}
-        onClick={() => {
-          if (!isCtTurn) {
-            return;
-          }
-
-          alternateTurn();
-        }}
-      >
-        {formatTime(ct.seconds)}
-      </div>
-      <div className="h-[10vh] bg-neutral-800 text-6xl md:text-8xl flex justify-between text-neutral-400">
-        <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            className="bi bi-arrow-clockwise"
-            onClick={handleTimerReset}
-            title="Reset the timer"
-          ></button>
-          <button
-            type="button"
-            className={`bi ${
-              isRunning ? "bi-pause-fill" : "bi-caret-right-fill"
-            }`}
-            onClick={handleTimerPauseUnpause}
-            title="Pause/Unpause the timer"
-          ></button>
+    <div className="h-screen bg-neutral-600">
+      <div className="flex flex-col justify-between h-screen max-w-[480px] mx-auto">
+        <div
+          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${ctTheme}`}
+          onClick={() => {
+            if (!isCtTurn) {
+              return;
+            }
+            alternateTurn();
+          }}
+        >
+          {formatTime(ct.seconds)}
         </div>
-        <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            className="bi bi-stopwatch"
-            onClick={handleGoBackClick}
-            title="Go back to menu"
-          ></button>
-          <button
-            type="button"
-            className={`bi ${
-              isMuted ? "bi-volume-mute-fill" : "bi-volume-up-fill"
-            }`}
-            onClick={handleMuteToggleClick}
-            title="Disable sounds"
-          ></button>
+        <div className="flex justify-between text-6xl h-1/6 bg-neutral-800 md:text-8xl text-neutral-500">
+          <div className="flex items-center justify-center gap-2">
+            <button
+              type="button"
+              className="bi bi-arrow-clockwise"
+              onClick={handleTimerReset}
+              title="Reset the timer"
+            ></button>
+            <button
+              type="button"
+              className={`bi ${
+                isRunning ? "bi-pause-fill" : "bi-caret-right-fill"
+              }`}
+              onClick={handleTimerPauseUnpause}
+              title="Pause/Unpause the timer"
+            ></button>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              type="button"
+              className="bi bi-stopwatch"
+              onClick={handleReturnClick}
+              title="Go back to menu"
+            ></button>
+            <button
+              type="button"
+              className={`bi ${
+                isMuted ? "bi-volume-mute-fill" : "bi-volume-up-fill"
+              }`}
+              onClick={handleMuteToggleClick}
+              title="Disable sounds"
+            ></button>
+          </div>
         </div>
+        <div
+          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${cbTheme}`}
+          onClick={() => {
+            if (isCtTurn) {
+              return;
+            }
+            alternateTurn();
+          }}
+        >
+          {formatTime(cb.seconds)}
+        </div>
+        <TimerSounds
+          counterClickAudioRef={counterClickAudioRef}
+          resetClickAudioRef={resetClickAudioRef}
+        />
       </div>
-      <div
-        className={`h-[45vh] text-8xl md:text-8xl flex justify-center items-center font-semibold ${cbTheme}`}
-        onClick={() => {
-          if (isCtTurn) {
-            return;
-          }
-
-          alternateTurn();
-        }}
-      >
-        {formatTime(cb.seconds)}
-      </div>
-
-      <TimerSounds
-        counterClickAudioRef={counterClickAudioRef}
-        resetClickAudioRef={resetClickAudioRef}
-      />
-    </>
+    </div>
   );
 };
 
