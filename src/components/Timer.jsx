@@ -1,68 +1,101 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useCounter } from "../hooks/useCountdownTimer";
+import { useSounds } from "../hooks/useSounds";
 import TimerSounds from "./TimerSounds";
 import { formatTime } from "../utils/formatTime";
+import { DEFAULT_BG_TEXT, TURN_BG_TEXT, FINISHED_BG_TEXT } from "./_Timer.js";
 
 const Timer = ({
-  counterTopInitialSeconds,
-  counterBottomInitialSeconds,
-  counterTopIncrementSeconds,
-  counterBottomIncrementSeconds,
+  counterTop,
+  counterBottom,
+  counterTopIncrement,
+  counterBottomIncrement,
+  isMuted,
   setIsInMenu,
   setIsMuted,
-  isMuted,
 }) => {
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [isCounterTopTurn, setIsCounterTopTurn] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isCtTurn, setIsCtTurn] = useState(true);
 
-  const counterTop = useCounter(counterTopInitialSeconds);
-  const counterBottom = useCounter(counterBottomInitialSeconds);
+  const ct = useCounter(counterTop); // Counter top (white).
+  const cb = useCounter(counterBottom); // Counter bottom (black).
+
+  // Counter themes.
+  const ctTheme = ct.isFinished
+    ? FINISHED_BG_TEXT
+    : ct.isPaused
+    ? DEFAULT_BG_TEXT
+    : TURN_BG_TEXT;
+  const cbTheme = cb.isFinished
+    ? FINISHED_BG_TEXT
+    : cb.isPaused
+    ? DEFAULT_BG_TEXT
+    : TURN_BG_TEXT;
+
+  const {
+    counterClickAudioRef,
+    resetClickAudioRef,
+    playCounterClick,
+    playResetClick,
+  } = useSounds();
 
   useEffect(() => {
-    if (isTimerRunning) {
+    if (isRunning) {
       // Continue the counter based on who's turn.
-      isCounterTopTurn ? counterTop.startTimer() : counterBottom.startTimer();
+      isCtTurn ? ct.startTimer() : cb.startTimer();
     } else {
-      counterTop.pauseTimer();
-      counterBottom.pauseTimer();
+      ct.pauseTimer();
+      cb.pauseTimer();
     }
-  }, [counterBottom, counterTop, isCounterTopTurn, isTimerRunning]);
+  }, [ct, cb, isCtTurn, isRunning]);
+
+  useEffect(() => {
+    if (ct.isFinished) {
+      alert("Black won on time!");
+    } else if (cb.isFinished) {
+      alert("White won on time!");
+    }
+  }, [ct.isFinished, cb.isFinished]);
 
   function alternateTurn() {
-    if (!isTimerRunning) {
+    if (!isRunning) {
       // If the timer is still paused.
       return;
     }
 
-    if (isCounterTopTurn) {
+    if (isCtTurn) {
       // When it's counter-top's turn.
-      counterTop.setMs((prev) => prev + counterTopIncrementSeconds * 1000); // Increment after each move.
-      counterTop.pauseTimer();
-      counterBottom.startTimer();
-      setIsCounterTopTurn(false);
+      ct.setMs((prev) => prev + counterTopIncrement * 1000); // Increment after each move.
+      ct.pauseTimer();
+      cb.startTimer();
+      setIsCtTurn(false);
     } else {
-      counterBottom.setMs(
-        (prev) => prev + counterBottomIncrementSeconds * 1000
-      );
-      counterBottom.pauseTimer();
-      counterTop.startTimer();
-      setIsCounterTopTurn(true);
+      cb.setMs((prev) => prev + counterBottomIncrement * 1000);
+      cb.pauseTimer();
+      ct.startTimer();
+      setIsCtTurn(true);
     }
 
-    playCounterClick();
+    playCounterClick(isMuted);
   }
 
   function handleTimerPauseUnpause() {
-    setIsTimerRunning((prevFlag) => !prevFlag);
+    setIsRunning((prevFlag) => !prevFlag);
   }
 
   function handleTimerReset() {
-    counterTop.resetTimer();
-    counterBottom.resetTimer();
-    setIsTimerRunning(false);
+    const confirmReset = confirm("Reset the clock?");
 
-    playResetClick();
+    if (!confirmReset) {
+      return;
+    }
+
+    ct.resetTimer();
+    cb.resetTimer();
+    setIsRunning(false);
+
+    playResetClick(isMuted);
   }
 
   function handleMuteToggleClick() {
@@ -70,47 +103,29 @@ const Timer = ({
   }
 
   function handleGoBackClick() {
+    const confirmGoBack = confirm("Go back to menu?");
+
+    if (!confirmGoBack) {
+      return;
+    }
+
     // Going back to menu.
     setIsInMenu(true);
-  }
-
-  // Playing audio on click.
-
-  const counterClickAudioRef = useRef(null);
-  const resetClickAudioRef = useRef(null);
-
-  function playCounterClick() {
-    if (isMuted) {
-      return;
-    }
-
-    counterClickAudioRef.current.play();
-  }
-
-  function playResetClick() {
-    if (isMuted) {
-      return;
-    }
-    resetClickAudioRef.current.play();
   }
 
   return (
     <>
       <div
-        className={`h-[45vh] text-8xl md:text-8xl flex justify-center items-center font-semibold rotate-180 ${
-          counterTop.isPaused
-            ? "bg-neutral-700 text-neutral-950"
-            : "bg-blue-700 text-white"
-        }`}
+        className={`h-[45vh] text-8xl md:text-8xl flex justify-center items-center font-semibold rotate-180 ${ctTheme}`}
         onClick={() => {
-          if (!isCounterTopTurn) {
+          if (!isCtTurn) {
             return;
           }
 
           alternateTurn();
         }}
       >
-        {formatTime(counterTop.seconds)}
+        {formatTime(ct.seconds)}
       </div>
       <div className="h-[10vh] bg-neutral-800 text-6xl md:text-8xl flex justify-between text-neutral-400">
         <div className="flex items-center justify-center gap-2">
@@ -123,7 +138,7 @@ const Timer = ({
           <button
             type="button"
             className={`bi ${
-              isTimerRunning ? "bi-pause-fill" : "bi-caret-right-fill"
+              isRunning ? "bi-pause-fill" : "bi-caret-right-fill"
             }`}
             onClick={handleTimerPauseUnpause}
             title="Pause/Unpause the timer"
@@ -132,7 +147,7 @@ const Timer = ({
         <div className="flex items-center justify-center gap-2">
           <button
             type="button"
-            className="bi bi-clock"
+            className="bi bi-stopwatch"
             onClick={handleGoBackClick}
             title="Go back to menu"
           ></button>
@@ -147,20 +162,16 @@ const Timer = ({
         </div>
       </div>
       <div
-        className={`h-[45vh] text-8xl md:text-8xl flex justify-center items-center font-semibold ${
-          counterBottom.isPaused
-            ? "bg-neutral-700 text-neutral-950"
-            : "bg-blue-700 text-white"
-        }`}
+        className={`h-[45vh] text-8xl md:text-8xl flex justify-center items-center font-semibold ${cbTheme}`}
         onClick={() => {
-          if (isCounterTopTurn) {
+          if (isCtTurn) {
             return;
           }
 
           alternateTurn();
         }}
       >
-        {formatTime(counterBottom.seconds)}
+        {formatTime(cb.seconds)}
       </div>
 
       <TimerSounds
