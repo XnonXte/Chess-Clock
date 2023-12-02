@@ -117,7 +117,7 @@ const Timer = ({
     <div className="h-screen bg-neutral-600">
       <div className="flex flex-col justify-between h-screen max-w-[480px] mx-auto">
         <div
-          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${ctTheme}`}
+          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${ctTheme} rotate-180`}
           onClick={() => {
             if (!isCtTurn) {
               return;
