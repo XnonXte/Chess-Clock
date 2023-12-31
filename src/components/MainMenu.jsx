@@ -10,20 +10,15 @@ const MainMenu = ({
   setStartingData,
   setIsTimeDifferenceEnabled,
 }) => {
-  const {
-    counterTop,
-    counterBottom,
-    counterTopIncrement,
-    counterBottomIncrement,
-  } = startingData;
+  const { top, bottom, topIncrement, bottomIncrement } = startingData;
 
   useEffect(() => {
     if (!isTimeDifferenceEnabled) {
       setStartingData((prev) => {
         return {
           ...prev,
-          counterBottom: prev.counterTop,
-          counterBottomIncrement: prev.counterTopIncrement,
+          bottom: prev.top,
+          bottomIncrement: prev.topIncrement,
         };
       });
     }
@@ -31,7 +26,6 @@ const MainMenu = ({
 
   function submitData(e) {
     e.preventDefault();
-
     setIsInMenu(false);
   }
 
@@ -39,7 +33,9 @@ const MainMenu = ({
     <div className="text-white bg-neutral-600">
       <div className="max-w-[480px] bg-neutral-700 flex flex-col justify-between h-screen p-2 mx-auto">
         <div>
-          <h2 className="mb-6 text-3xl font-bold text-center">Chess Clock</h2>
+          <h2 className="mb-6 text-2xl font-bold text-center">
+            Xnon&apos;s Chess Clock
+          </h2>
           <form className="flex flex-col gap-2" onSubmit={submitData}>
             <div className="flex items-center justify-between">
               <span>Time difference</span>
@@ -50,7 +46,7 @@ const MainMenu = ({
                   onChange={(e) => setIsTimeDifferenceEnabled(e.target.checked)}
                   checked={isTimeDifferenceEnabled}
                 />
-                <div className="w-11 h-6 bg-neutral-600 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="w-11 h-6 bg-neutral-600 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3264ff]"></div>
               </label>
             </div>
 
@@ -72,11 +68,11 @@ const MainMenu = ({
                       setStartingData((prev) => {
                         return {
                           ...prev,
-                          counterTop: e.target.value,
+                          top: e.target.value,
                         };
                       })
                     }
-                    value={counterTop}
+                    value={top}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -93,11 +89,11 @@ const MainMenu = ({
                       setStartingData((prev) => {
                         return {
                           ...prev,
-                          counterTopIncrement: e.target.value,
+                          topIncrement: e.target.value,
                         };
                       })
                     }
-                    value={counterTopIncrement}
+                    value={topIncrement}
                   />
                 </div>
                 <h4 className="mb-2 text-lg font-semibold">Black</h4>
@@ -116,11 +112,11 @@ const MainMenu = ({
                       setStartingData((prev) => {
                         return {
                           ...prev,
-                          counterBottom: e.target.value,
+                          bottom: e.target.value,
                         };
                       })
                     }
-                    value={counterBottom}
+                    value={bottom}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -137,11 +133,11 @@ const MainMenu = ({
                       setStartingData((prev) => {
                         return {
                           ...prev,
-                          counterBottomIncrement: e.target.value,
+                          bottomIncrement: e.target.value,
                         };
                       })
                     }
-                    value={counterBottomIncrement}
+                    value={bottomIncrement}
                   />
                 </div>
               </>
@@ -155,18 +151,17 @@ const MainMenu = ({
                     name="time"
                     id="time"
                     className="p-2 text-white border-1 placeholder:italic placeholder:text-neutral-600 bg-neutral-600"
-                    placeholder="Enter minute
-                      "
+                    placeholder="Enter minute"
                     onChange={(e) =>
                       setStartingData((prev) => {
                         return {
                           ...prev,
-                          counterTop: e.target.value,
-                          counterBottom: e.target.value,
+                          top: e.target.value,
+                          bottom: e.target.value,
                         };
                       })
                     }
-                    value={counterTop}
+                    value={top}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -183,12 +178,12 @@ const MainMenu = ({
                       setStartingData((prev) => {
                         return {
                           ...prev,
-                          counterTopIncrement: e.target.value,
-                          counterBottomIncrement: e.target.value,
+                          topIncrement: e.target.value,
+                          bottomIncrement: e.target.value,
                         };
                       })
                     }
-                    value={counterTopIncrement}
+                    value={topIncrement}
                   />
                 </div>
               </>
@@ -203,12 +198,12 @@ const MainMenu = ({
                   onChange={(e) => setIsMuted(e.target.checked)}
                   checked={isMuted}
                 />
-                <div className="w-11 h-6 bg-neutral-600 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="w-11 h-6 bg-neutral-600 rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3264ff]"></div>
               </label>
             </div>
             <button
               type="submit"
-              className="px-4 py-2 mt-6 text-lg bg-blue-600 hover:bg-blue-700"
+              className="px-4 py-2 mt-6 text-lg bg-[#3264ff] hover:bg-blue-700"
             >
               Start!
             </button>
@@ -216,8 +211,23 @@ const MainMenu = ({
         </div>
         <footer>
           <div className="text-center">
-            <h6 className="text-sm font-semibold">&copy; 2023 XnonXte</h6>
-            <span className="text-xs">Chess Clock v0.0.2</span>
+            <a
+              href="https://twitter.com/XnonXte"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-semibold hover:text-[#1DA1F2] hover:cursor-pointer"
+            >
+              &copy; 2023 XnonXte
+            </a>
+            <p className="text-xs">Chess Clock v0.0.3</p>
+            <a
+              href="https://github.com/XnonXte/Chess-Clock"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm hover:text-neutral-400 hover:cursor-pointer"
+            >
+              <i className="bi bi-github"></i> GitHub
+            </a>
           </div>
         </footer>
       </div>

@@ -1,101 +1,128 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
-import { useCounter } from "../hooks/useCountdownTimer";
+import { useState, useEffect, useRef } from "react";
+import { useCounter } from "../hooks/useCounter";
 import { useSounds } from "../hooks/useSounds";
 import TimerSounds from "./TimerSounds";
-import { formatTime } from "../utils/formatTime";
-import { DEFAULT_BG_TEXT, TURN_BG_TEXT, FINISHED_BG_TEXT } from "./_Timer.js";
+import { parseTime } from "../utils/parseTime";
+import { DEFAULT_BG_TEXT, TURN_BG_TEXT, FINISHED_BG_TEXT } from "./_Timer";
 
 const Timer = ({
-  counterTop,
-  counterBottom,
-  counterTopIncrement,
-  counterBottomIncrement,
+  topTime,
+  bottomTime,
+  topIncrement,
+  bottomIncrement,
   isMuted,
   setIsInMenu,
   setIsMuted,
 }) => {
-  const [isRunning, setIsRunning] = useState(false);
-  const [isCtTurn, setIsCtTurn] = useState(true);
+  // Please close this file if you have fear of some insane level of spaghetti code.
+  // It's not the optimized for clarity, but overall the code works.
 
-  const ct = useCounter(counterTop); // Counter top (white).
-  const cb = useCounter(counterBottom); // Counter bottom (black).
+  const hasEffectRunOnce = useRef(null);
+
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isTopTurn, setIsTopTurn] = useState(true);
+
+  const top = useCounter(topTime); // Counter top (white).
+  const bottom = useCounter(bottomTime); // Counter bottom (black).
 
   // Counter themes.
-  const ctTheme = ct.isFinished
+  const topTheme = top.isFinished
     ? FINISHED_BG_TEXT
-    : ct.isPaused
+    : top.isPaused
     ? DEFAULT_BG_TEXT
     : TURN_BG_TEXT;
-  const cbTheme = cb.isFinished
+  const bottomTheme = bottom.isFinished
     ? FINISHED_BG_TEXT
-    : cb.isPaused
+    : bottom.isPaused
     ? DEFAULT_BG_TEXT
     : TURN_BG_TEXT;
 
   const {
     counterClickAudioRef,
     resetClickAudioRef,
+    finishedAudioRef,
     playCounterClick,
     playResetClick,
+    playFinished,
   } = useSounds();
 
   useEffect(() => {
-    if (isRunning) {
-      // Continue the counter based on who's turn.
-      isCtTurn ? ct.startTimer() : cb.startTimer();
+    // useEffect hook on alternating turns.
+
+    // Which counter should takes turn.
+    if (isTimerRunning) {
+      isTopTurn ? top.startTimer() : bottom.startTimer();
     } else {
-      ct.pauseTimer();
-      cb.pauseTimer();
+      top.pauseTimer();
+      bottom.pauseTimer();
     }
-  }, [ct, cb, isCtTurn, isRunning]);
+  }, [top, bottom, isTopTurn, isTimerRunning]);
 
   useEffect(() => {
-    if (ct.isFinished) {
-      alert("Black won on time!");
-    } else if (cb.isFinished) {
-      alert("White won on time!");
+    // useEffect hook on timer finished.
+    if (top.isFinished || (bottom.isFinished && !hasEffectRunOnce.current)) {
+      // Finished message.
+      playFinished();
+
+      // Clean up operations.
+      top.pauseTimer();
+      bottom.pauseTimer();
+      setIsTimerRunning(false);
+      setIsTopTurn(true);
+
+      // Mark this effect hook as run.
+      hasEffectRunOnce.current = true;
+
+      if (top.isFinished) {
+        alert("Black won on time!");
+      } else if (bottom.isFinished) {
+        alert("Black won on time!");
+      }
     }
-  }, [ct.isFinished, cb.isFinished]);
+  }, [top.isFinished, bottom.isFinished, top, bottom, playFinished]);
 
   function alternateTurn() {
-    if (!isRunning) {
+    if (!isTimerRunning) {
       // If the timer is still paused.
       return;
     }
 
-    if (isCtTurn) {
-      // When it's counter-top's turn.
-      ct.setMs((prev) => prev + counterTopIncrement * 1000); // Increment after each move.
-      ct.pauseTimer();
-      cb.startTimer();
-      setIsCtTurn(false);
+    if (isTopTurn) {
+      top.setTimer((prev) => prev + topIncrement * 1000); // Increment after each move.
+      top.pauseTimer();
+      bottom.startTimer();
+      setIsTopTurn(false);
     } else {
-      cb.setMs((prev) => prev + counterBottomIncrement * 1000);
-      cb.pauseTimer();
-      ct.startTimer();
-      setIsCtTurn(true);
+      bottom.setTimer((prev) => prev + bottomIncrement * 1000);
+      bottom.pauseTimer();
+      top.startTimer();
+      setIsTopTurn(true);
     }
 
     playCounterClick(isMuted);
   }
 
   function handleTimerPauseUnpause() {
-    setIsRunning((prevFlag) => !prevFlag);
+    if (top.timer > 0 && bottom.timer > 0) {
+      setIsTimerRunning((prevFlag) => !prevFlag);
+    }
   }
 
   function handleTimerReset() {
     const confirmReset = confirm("Reset the clock?");
 
-    if (!confirmReset) {
+    if (confirmReset === false) {
       return;
     }
 
-    ct.resetTimer();
-    cb.resetTimer();
-    setIsRunning(false);
-
+    top.resetTimer();
+    bottom.resetTimer();
+    setIsTimerRunning(false);
     playResetClick(isMuted);
+
+    // Set the finished effect flag to true to set for another finished state.
+    hasEffectRunOnce.current = false;
   }
 
   function handleMuteToggleClick() {
@@ -105,11 +132,10 @@ const Timer = ({
   function handleReturnClick() {
     const confirmReturn = confirm("Go back to menu?");
 
-    if (!confirmReturn) {
+    if (confirmReturn === false) {
       return;
     }
 
-    // Going back to menu.
     setIsInMenu(true);
   }
 
@@ -117,15 +143,15 @@ const Timer = ({
     <div className="h-screen bg-neutral-600">
       <div className="flex flex-col justify-between h-screen max-w-[480px] mx-auto">
         <div
-          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${ctTheme} rotate-180`}
+          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${topTheme} rotate-180`}
           onClick={() => {
-            if (!isCtTurn) {
+            if (!isTopTurn) {
               return;
             }
             alternateTurn();
           }}
         >
-          {formatTime(ct.seconds)}
+          {parseTime(top.timer)}
         </div>
         <div className="flex justify-between text-6xl h-1/6 bg-neutral-800 md:text-8xl text-neutral-500">
           <div className="flex items-center justify-center gap-2">
@@ -138,7 +164,7 @@ const Timer = ({
             <button
               type="button"
               className={`bi ${
-                isRunning ? "bi-pause-fill" : "bi-caret-right-fill"
+                isTimerRunning ? "bi-pause-fill" : "bi-caret-right-fill"
               }`}
               onClick={handleTimerPauseUnpause}
               title="Pause/Unpause the timer"
@@ -162,19 +188,20 @@ const Timer = ({
           </div>
         </div>
         <div
-          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${cbTheme}`}
+          className={`flex-1 text-8xl font-semibold flex items-center justify-center ${bottomTheme}`}
           onClick={() => {
-            if (isCtTurn) {
+            if (isTopTurn) {
               return;
             }
             alternateTurn();
           }}
         >
-          {formatTime(cb.seconds)}
+          {parseTime(bottom.timer)}
         </div>
         <TimerSounds
           counterClickAudioRef={counterClickAudioRef}
           resetClickAudioRef={resetClickAudioRef}
+          finishedAudioRef={finishedAudioRef}
         />
       </div>
     </div>
